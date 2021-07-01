@@ -1,2 +1,1 @@
-# run_analysis.R
-a
+All the code is written and explained in run_analysis.R and CodeBook.md
