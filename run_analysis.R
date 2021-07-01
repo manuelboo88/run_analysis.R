@@ -1,9 +1,6 @@
 #setting work directory#
 pathdata <- file.path("C:/Users/manue/Desktop/UCI HAR Dataset/")
 
-#get all files in a list#
-files <- list.files(pathdata, recursive=TRUE)
-
 #reading each file#
 xtest <- read.table(file.path(pathdata, "test", "X_test.txt"))
 ytest <- read.table(file.path(pathdata, "test", "y_test.txt"))
@@ -23,7 +20,6 @@ colnames(ytrain) <- "activityId"
 colnames(subject_train) <- "subjectId"
 colnames(activityLabels) <- c("activityId","activityType")
 
-
 #marging the files#
 trainmarge <- cbind(ytrain, subject_train, xtrain)
 testmarge <- cbind(ytest, subject_test, xtest)
@@ -34,10 +30,21 @@ library(dplyr)
 mean_deviation <- setAllInOne %>% select(contains("activityId") | contains("subjectId") | contains("mean") | contains("std"))
 
 #get descriptive names from each column#
-DescriptiveNames = merge(activityLabels, mean_deviation, by="activityId")
+DescriptiveNames <- merge(activityLabels, mean_deviation, by="activityId")
+names(DescriptiveNames)<-gsub("Acc", "Accelerometer", names(DescriptiveNames))
+names(DescriptiveNames)<-gsub("Gyro", "Gyroscope", names(DescriptiveNames))
+names(DescriptiveNames)<-gsub("BodyBody", "Body", names(DescriptiveNames))
+names(DescriptiveNames)<-gsub("Mag", "Magnitude", names(DescriptiveNames))
+names(DescriptiveNames)<-gsub("^t", "Time", names(DescriptiveNames))
+names(DescriptiveNames)<-gsub("^f", "Frequency", names(DescriptiveNames))
+names(DescriptiveNames)<-gsub("tBody", "TimeBody", names(DescriptiveNames))
+names(DescriptiveNames)<-gsub("-mean()", "Mean", names(DescriptiveNames), ignore.case = TRUE)
+names(DescriptiveNames)<-gsub("-std()", "STD", names(DescriptiveNames), ignore.case = TRUE)
+names(DescriptiveNames)<-gsub("-freq()", "Frequency", names(DescriptiveNames), ignore.case = TRUE)
+names(DescriptiveNames)<-gsub("angle", "Angle", names(DescriptiveNames))
+names(DescriptiveNames)<-gsub("gravity", "Gravity", names(DescriptiveNames))
 
 #create a independent data set with the average of each variable for each activity and each subject#
 tidyData <- aggregate(DescriptiveNames$subjectId + DescriptiveNames$activityId, DescriptiveNames, mean)
 tidyData <- tidyData[order(tidyData$subjectId,tidyData$activityId),]
 write.table(tidyData, file = "tidyData.txt", row.names = FALSE)
-
