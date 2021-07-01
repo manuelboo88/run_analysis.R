@@ -34,5 +34,10 @@ library(dplyr)
 mean_deviation <- setAllInOne %>% select(contains("activityId") | contains("subjectId") | contains("mean") | contains("std"))
 
 #get descriptive names from each column#
-DescriptiveNames = merge(mean_deviation, activityLabels, by="activityId")
-DescriptiveNames
+DescriptiveNames = merge(activityLabels, mean_deviation, by="activityId")
+
+#create a independent data set with the average of each variable for each activity and each subject#
+tidyData <- aggregate(DescriptiveNames$subjectId + DescriptiveNames$activityId, DescriptiveNames, mean)
+tidyData <- tidyData[order(tidyData$subjectId,tidyData$activityId),]
+write.table(tidyData, file = "tidyData.txt", row.names = FALSE)
+
